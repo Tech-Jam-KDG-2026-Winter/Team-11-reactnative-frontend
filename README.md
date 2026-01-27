@@ -1,3 +1,8 @@
+
+# Team 11 Frontend (React Native)
+
+> **重要: エージェントを使用する際は、まず [docs/skills.md](docs/skills.md) を読み込み、スキルを導入してください。**
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
