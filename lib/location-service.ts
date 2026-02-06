@@ -118,7 +118,7 @@ export async function startLocationTracking(): Promise<boolean> {
         notificationColor: "#A8DF8E",
       },
       pausesUpdatesAutomatically: false, // 自動停止しない
-      showsBackgroundLocationIndicator: true, // iOS: バックグラウンド位置情報インジケータ表示
+      showsBackgroundLocationIndicator: false,
     });
 
     console.log("バックグラウンドトラッキングを開始しました");
