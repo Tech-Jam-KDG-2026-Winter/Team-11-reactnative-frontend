@@ -1,10 +1,10 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { IconSymbol, type IconSymbolName } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
 
-import { cardContainer, summaryCardIconBox } from './styles';
+import { cardContainer } from './styles';
 
 export interface SummaryCardProps {
   icon: IconSymbolName;
@@ -24,48 +24,54 @@ export function SummaryCard({
   iconBgColor = 'rgba(168, 223, 142, 0.1)',
 }: SummaryCardProps) {
   return (
-    <View
-      style={[
-        cardContainer,
-        {
-          width,
-          minHeight: 120,
-          paddingVertical: 16,
-          paddingHorizontal: 14,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-      ]}
-    >
-      <View style={[summaryCardIconBox, { backgroundColor: iconBgColor }]}>
-        <IconSymbol name={icon} size={22} color={iconColor} />
+    <View style={[cardContainer, styles.card, { width }]}>
+      <View style={styles.topRow}>
+        <View style={[styles.iconBox, { backgroundColor: iconBgColor }]}>
+          <IconSymbol name={icon} size={18} color={iconColor} />
+        </View>
+        <Text selectable style={styles.label}>
+          {label}
+        </Text>
       </View>
-      <Text
-        selectable
-        style={{
-          fontSize: 10,
-          fontWeight: '600',
-          color: '#718268',
-          fontFamily: Fonts.rounded,
-          letterSpacing: 0.5,
-          textAlign: 'center',
-        }}
-      >
-        {label}
-      </Text>
-      <Text
-        selectable
-        style={{
-          fontSize: 22,
-          fontWeight: '700',
-          color: '#141712',
-          fontFamily: Fonts.rounded,
-          textAlign: 'center',
-          lineHeight: 28,
-        }}
-      >
+      <Text selectable style={styles.value}>
         {value}
       </Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    minHeight: 100,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    justifyContent: 'space-between',
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconBox: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#718268',
+    fontFamily: Fonts.rounded,
+    letterSpacing: 0.3,
+  },
+  value: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#2C3527',
+    fontFamily: Fonts.rounded,
+    letterSpacing: -0.5,
+    marginTop: 8,
+  },
+});

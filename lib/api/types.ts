@@ -49,6 +49,11 @@ export interface Quest {
   day: string;
   created_at: string;
   updated_at: string;
+  source_user_uuid?: string | null;
+  source_user_name?: string | null;
+  source_quest_id?: number | null;
+  source_encounter_id?: number | null;
+  source_type?: string | null;
 }
 
 // AIレコメンデーションのクエスト（生成時）
@@ -124,6 +129,7 @@ export interface CompletedQuest {
   id: number;
   title: string;
   completed_at: string;
+  description?: string | null;
 }
 
 // すれ違い + クエスト情報

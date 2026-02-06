@@ -79,6 +79,11 @@ function AnimatedQuestCard({ quest, index, isToggling, onToggle, showFireworks, 
   }, [index]);
 
   const isHighlighted = index === 0;
+  const sourceLabel = quest.source_user_name
+    ? `${quest.source_user_name}さんのクエスト`
+    : quest.source_user_uuid
+      ? 'すれ違いクエスト'
+      : null;
 
   return (
     <Animated.View
@@ -120,13 +125,27 @@ function AnimatedQuestCard({ quest, index, isToggling, onToggle, showFireworks, 
                 }}>
                 {quest.completed ? '完了済み' : 'QUEST'}
               </Text>
+              {sourceLabel && (
+                <Text
+                  selectable
+                  style={{
+                    fontSize: 11,
+                    fontWeight: '700',
+                    color: '#D87D8E',
+                    marginTop: 6,
+                    fontFamily: Fonts.rounded,
+                  }}
+                >
+                  {sourceLabel}
+                </Text>
+              )}
               <Text
                 selectable
                 style={{
                   fontSize: 18,
                   fontWeight: '700',
                   color: '#332D2E',
-                  marginTop: 6,
+                  marginTop: sourceLabel ? 4 : 6,
                   lineHeight: 24,
                   fontFamily: Fonts.rounded,
                   textDecorationLine: quest.completed ? 'line-through' : 'none',

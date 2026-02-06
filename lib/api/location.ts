@@ -83,7 +83,7 @@ export async function getMyEncounters(): Promise<EncounterWithQuests[]> {
       // 相手の今日完了したクエストを取得
       const { data: quests, error: questsError } = await supabase
         .from("quests")
-        .select("id, title, updated_at")
+        .select("id, title, description, updated_at")
         .eq("uuid", encounter.other_user_id)
         .eq("completed", true)
         .eq("day", today)
@@ -100,6 +100,7 @@ export async function getMyEncounters(): Promise<EncounterWithQuests[]> {
         quests?.map((q) => ({
           id: q.id,
           title: q.title,
+          description: q.description ?? null,
           completed_at: q.updated_at,
         })) ?? [];
 

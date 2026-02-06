@@ -20,12 +20,16 @@ import { SummaryCard } from '@/components/log/SummaryCard';
 import { CARD_GAP, CARD_ROW_MARGIN, logStyles } from '@/components/log/styles';
 import { Fonts } from '@/constants/theme';
 import { useNightQuestionnaire } from '@/hooks/use-night-questionnaire';
+import { useAuth } from '@/hooks/use-auth';
 import {
+  adoptEncounterQuest,
   getMyEncounters,
   getThanksStampSentByEncounterIds,
   getThanksStampsReceivedCountToday,
+  getTodayQuests,
   sendThanksStamp,
   type EncounterWithQuests,
+  type CompletedQuest,
 } from '@/lib/api';
 
 const DEBUG_SHOW_ENCOUNTERS_WITHOUT_NIGHT_KEY = 'debug:showEncountersWithoutNight';
@@ -41,12 +45,16 @@ const getDebugShowEncountersWithoutNight = async (): Promise<boolean> => {
 
 export default function LogScreen() {
   const { isCompleted, isLoading: isLoadingQuestionnaire } = useNightQuestionnaire();
+  const { session } = useAuth();
+  const userUuid = session?.user?.id;
   const [encounters, setEncounters] = useState<EncounterWithQuests[]>([]);
   const [isLoadingEncounters, setIsLoadingEncounters] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
   const [thanksStampsCount, setThanksStampsCount] = useState(0);
   const [stampSentIds, setStampSentIds] = useState<Set<number>>(new Set());
   const [sendingEncounterId, setSendingEncounterId] = useState<number | null>(null);
+  const [adoptedQuestIds, setAdoptedQuestIds] = useState<Set<number>>(new Set());
+  const [adoptingQuestIds, setAdoptingQuestIds] = useState<Set<number>>(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { width: windowWidth } = useWindowDimensions();
@@ -85,9 +93,25 @@ export default function LogScreen() {
     }
   }, [debugMode, isCompleted]);
 
+  const loadAdoptedQuests = useCallback(async () => {
+    if (!userUuid) return;
+    try {
+      const myQuests = await getTodayQuests(userUuid);
+      const adoptedIds = new Set(
+        myQuests
+          .map((quest) => quest.source_quest_id)
+          .filter((id): id is number => typeof id === 'number')
+      );
+      setAdoptedQuestIds(adoptedIds);
+    } catch (error) {
+      console.error('採用済みクエストの取得に失敗:', error);
+    }
+  }, [userUuid]);
+
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     const list = await loadEncounters();
+    await loadAdoptedQuests();
     if (list.length > 0) {
       try {
         const [count, sentSet] = await Promise.all([
@@ -101,13 +125,14 @@ export default function LogScreen() {
       }
     }
     setIsRefreshing(false);
-  }, [loadEncounters]);
+  }, [loadEncounters, loadAdoptedQuests]);
 
   useEffect(() => {
     if ((debugMode || isCompleted) && !isLoadingQuestionnaire) {
       loadEncounters();
+      loadAdoptedQuests();
     }
-  }, [isCompleted, isLoadingQuestionnaire, debugMode, loadEncounters]);
+  }, [isCompleted, isLoadingQuestionnaire, debugMode, loadEncounters, loadAdoptedQuests]);
 
   useEffect(() => {
     if (!isLoadingEncounters) {
@@ -144,6 +169,42 @@ export default function LogScreen() {
       }
     },
     [encounters, stampSentIds, sendingEncounterId]
+  );
+
+  const handleAdoptQuest = useCallback(
+    async (encounter: EncounterWithQuests, quest: CompletedQuest) => {
+      if (!userUuid) return;
+      if (adoptedQuestIds.has(quest.id) || adoptingQuestIds.has(quest.id)) return;
+
+      setAdoptingQuestIds((prev) => new Set(prev).add(quest.id));
+      try {
+        await adoptEncounterQuest(userUuid, {
+          title: quest.title,
+          description: quest.description ?? undefined,
+          source_user_uuid: encounter.other_user_id,
+          source_user_name: encounter.other_user_name ?? null,
+          source_quest_id: quest.id,
+          source_encounter_id: encounter.id,
+        });
+        setAdoptedQuestIds((prev) => {
+          const next = new Set(prev);
+          next.add(quest.id);
+          return next;
+        });
+      } catch (err) {
+        Alert.alert(
+          '追加できませんでした',
+          err instanceof Error ? err.message : 'クエストの追加に失敗しました。'
+        );
+      } finally {
+        setAdoptingQuestIds((prev) => {
+          const next = new Set(prev);
+          next.delete(quest.id);
+          return next;
+        });
+      }
+    },
+    [userUuid, adoptedQuestIds, adoptingQuestIds]
   );
 
   if (!isCompleted && !debugMode) {
@@ -196,6 +257,18 @@ export default function LogScreen() {
 
         {!isLoadingEncounters && encounters.length > 0 && (
           <View style={logStyles.encounterList}>
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: '600',
+                color: '#9CA986',
+                fontFamily: Fonts.rounded,
+                letterSpacing: 0.3,
+                marginBottom: -2,
+              }}
+            >
+              今日すれ違った仲間
+            </Text>
             {encounters.map((encounter) => (
               <EncounterRow
                 key={encounter.id}
@@ -203,6 +276,9 @@ export default function LogScreen() {
                 stampSent={stampSentIds.has(encounter.id)}
                 sending={sendingEncounterId === encounter.id}
                 onSendThanksStamp={() => handleThanksStamp(encounter.id)}
+                adoptedQuestIds={adoptedQuestIds}
+                adoptingQuestIds={adoptingQuestIds}
+                onAdoptQuest={(quest) => handleAdoptQuest(encounter, quest)}
               />
             ))}
           </View>

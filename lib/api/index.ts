@@ -11,7 +11,7 @@ export {
 export { generateRecommendations, getMascotState, getHint, completeMascotOnboarding } from "./ai";
 
 // Quests API
-export { getTodayQuests, toggleQuestComplete } from "./quests";
+export { getTodayQuests, toggleQuestComplete, adoptEncounterQuest } from "./quests";
 
 // Location API
 export { recordLocation, getMyEncounters } from "./location";

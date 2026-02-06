@@ -24,3 +24,31 @@ export async function toggleQuestComplete(
     userUuid,
   });
 }
+
+interface AdoptEncounterQuestRequest {
+  title: string;
+  description?: string;
+  source_user_uuid: string;
+  source_user_name?: string | null;
+  source_quest_id: number;
+  source_encounter_id?: number | null;
+}
+
+interface AdoptEncounterQuestResponse {
+  created: boolean;
+  quest: Quest;
+}
+
+/**
+ * すれ違いユーザーのクエストを自分の今日のクエストとして追加する
+ */
+export async function adoptEncounterQuest(
+  userUuid: string,
+  payload: AdoptEncounterQuestRequest
+): Promise<AdoptEncounterQuestResponse> {
+  return apiRequest<AdoptEncounterQuestResponse>("/api/quests/adopt", {
+    method: "POST",
+    userUuid,
+    body: payload,
+  });
+}
