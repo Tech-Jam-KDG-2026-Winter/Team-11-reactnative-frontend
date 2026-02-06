@@ -209,7 +209,7 @@ export default function PersonalityOnboardingScreen() {
                 こんな風に話してほしい（任意）
               </Text>
               <TextInput
-                placeholder="例: 関西弁で話してほしい、厳しめに励ましてほしい..."
+                placeholder="例: 厳し目に励ましてほしい、体育会系のクエストが好きです"
                 placeholderTextColor="rgba(113, 130, 104, 0.5)"
                 value={personalityNote}
                 onChangeText={(text) =>
