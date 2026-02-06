@@ -111,39 +111,41 @@ export function EncounterRow({
                     {
                       rotate: chevronAnim.interpolate({
                         inputRange: [0, 1],
-                        outputRange: ['0deg', '90deg'],
+                        outputRange: ['0deg', '180deg'],
                       }),
                     },
                   ],
                 },
               ]}
             >
-              <IconSymbol name="chevron.right" size={18} color="#9CA986" />
+              <IconSymbol name="chevron.down" size={16} color="#9CA986" />
             </Animated.View>
           )}
         </Pressable>
-        <Pressable
-          onPress={onSendThanksStamp}
-          disabled={stampSent || sending}
-          style={({ pressed }) => [
-            styles.stampButton,
-            stampSent && styles.stampButtonSent,
-            pressed && !stampSent && styles.stampButtonPressed,
-          ]}
-        >
-          {sending ? (
-            <ActivityIndicator size="small" color={stampSent ? '#FFFFFF' : '#FFAAB8'} />
-          ) : (
-            <IconSymbol
-              name="heart.fill"
-              size={16}
-              color={stampSent ? '#FFFFFF' : '#FFAAB8'}
-            />
-          )}
-          <Text selectable style={[styles.stampText, stampSent && styles.stampTextSent]}>
+        <View style={styles.stampColumn}>
+          <Pressable
+            onPress={onSendThanksStamp}
+            disabled={stampSent || sending}
+            style={({ pressed }) => [
+              styles.stampButton,
+              stampSent && styles.stampButtonSent,
+              pressed && !stampSent && styles.stampButtonPressed,
+            ]}
+          >
+            {sending ? (
+              <ActivityIndicator size="small" color={stampSent ? '#FFFFFF' : '#FFAAB8'} />
+            ) : (
+              <IconSymbol
+                name="heart.fill"
+                size={18}
+                color={stampSent ? '#FFFFFF' : '#FFAAB8'}
+              />
+            )}
+          </Pressable>
+          <Text selectable style={[styles.stampLabel, stampSent && styles.stampLabelSent]}>
             {stampSent ? '送信済み' : 'お疲れ様'}
           </Text>
-        </Pressable>
+        </View>
       </View>
       {expanded && hasCompletedQuests && (
         <View style={styles.expandedSection}>
@@ -247,16 +249,19 @@ const styles = StyleSheet.create({
     width: 22,
     alignItems: 'flex-end',
   },
-  stampButton: {
-    flexDirection: 'row',
+  stampColumn: {
     alignItems: 'center',
-    gap: 5,
-    height: 34,
+    gap: 4,
+  },
+  stampButton: {
+    height: 40,
+    width: 40,
     borderRadius: 999,
-    backgroundColor: 'rgba(255, 170, 184, 0.10)',
+    backgroundColor: 'rgba(255, 170, 184, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 170, 184, 0.25)',
-    paddingHorizontal: 12,
+    borderColor: 'rgba(255, 170, 184, 0.20)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   stampButtonSent: {
     backgroundColor: '#FFAAB8',
@@ -265,14 +270,14 @@ const styles = StyleSheet.create({
   stampButtonPressed: {
     backgroundColor: 'rgba(255, 170, 184, 0.20)',
   },
-  stampText: {
-    fontSize: 11,
+  stampLabel: {
+    fontSize: 10,
     fontWeight: '700',
-    color: '#FFAAB8',
+    color: '#9CA986',
     fontFamily: Fonts.rounded,
   },
-  stampTextSent: {
-    color: '#FFFFFF',
+  stampLabelSent: {
+    color: '#D87D8E',
   },
   adoptButton: {
     height: 32,
