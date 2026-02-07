@@ -107,6 +107,28 @@ export async function updateMyDisplayName(displayName: string): Promise<void> {
 }
 
 /**
+ * 自分のパスワードを更新（Supabase Auth）
+ * @param newPassword 新しいパスワード。空や短すぎる場合は呼び出し元でバリデーションすること。
+ */
+export async function updateMyPassword(newPassword: string): Promise<void> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("認証情報の取得に失敗しました");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+  if (error) {
+    console.error("パスワードの更新に失敗:", error);
+    throw new Error(`パスワードの更新に失敗: ${error.message}`);
+  }
+}
+
+/**
  * 性格設定（タグと自由入力）を更新（mascotsテーブル）
  * @param tags 性格タグ（最大5個）
  * @param note 自由入力（最大200文字）

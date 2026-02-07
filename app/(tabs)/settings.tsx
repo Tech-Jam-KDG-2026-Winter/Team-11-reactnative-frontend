@@ -15,6 +15,7 @@ import {
   getMyProfile,
   updateMyAvatar,
   updateMyDisplayName,
+  updateMyPassword,
   updateMyPersonality,
   getMyPersonality,
 } from "@/lib/api";
@@ -85,6 +86,9 @@ export default function SettingsScreen() {
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [avatarUrlInput, setAvatarUrlInput] = useState("");
   const [isSavingAccount, setIsSavingAccount] = useState(false);
+  const [newPasswordInput, setNewPasswordInput] = useState("");
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState("");
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   // 性格設定用のstate
   const [personalityTags, setPersonalityTags] = useState<string[]>([]);
@@ -191,6 +195,33 @@ export default function SettingsScreen() {
     }
   };
 
+  const MIN_PASSWORD_LENGTH = 6;
+
+  const handleSavePassword = async () => {
+    if (newPasswordInput !== confirmPasswordInput) {
+      Alert.alert("入力エラー", "パスワードが一致しません。");
+      return;
+    }
+    if (newPasswordInput.length < MIN_PASSWORD_LENGTH) {
+      Alert.alert(
+        "入力エラー",
+        `パスワードは${MIN_PASSWORD_LENGTH}文字以上で入力してください。`
+      );
+      return;
+    }
+    setIsSavingPassword(true);
+    try {
+      await updateMyPassword(newPasswordInput);
+      setNewPasswordInput("");
+      setConfirmPasswordInput("");
+      Alert.alert("完了", "パスワードを変更しました");
+    } catch {
+      Alert.alert("エラー", "パスワードの変更に失敗しました");
+    } finally {
+      setIsSavingPassword(false);
+    }
+  };
+
   const handleTogglePersonalityTag = (tag: string) => {
     setPersonalityTags((prev) => {
       if (prev.includes(tag)) {
@@ -250,6 +281,12 @@ export default function SettingsScreen() {
             onAvatarUrlChange={setAvatarUrlInput}
             onSaveAccount={handleSaveAccount}
             isSavingAccount={isSavingAccount}
+            newPasswordInput={newPasswordInput}
+            confirmPasswordInput={confirmPasswordInput}
+            onNewPasswordChange={setNewPasswordInput}
+            onConfirmPasswordChange={setConfirmPasswordInput}
+            onSavePassword={handleSavePassword}
+            isSavingPassword={isSavingPassword}
           />
           <PersonalitySection
             tags={PERSONALITY_TAGS}

@@ -28,6 +28,7 @@ export {
   getMyProfile,
   updateMyAvatar,
   updateMyDisplayName,
+  updateMyPassword,
   updateMyPersonality,
   getMyPersonality,
 } from "./user";
