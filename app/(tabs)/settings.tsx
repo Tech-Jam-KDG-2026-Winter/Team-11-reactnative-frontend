@@ -11,7 +11,13 @@ import { DebugSettingsCard } from "@/components/settings/DebugSettingsCard";
 import { LogoutButton } from "@/components/settings/LogoutButton";
 import { PersonalitySection } from "@/components/settings/PersonalitySection";
 import { useAuth } from "@/hooks/use-auth";
-import { getMyProfile, updateMyAvatar, updateMyPersonality, getMyPersonality } from "@/lib/api";
+import {
+  getMyProfile,
+  updateMyAvatar,
+  updateMyDisplayName,
+  updateMyPersonality,
+  getMyPersonality,
+} from "@/lib/api";
 
 // マスコット性格タグのプリセット候補
 const PERSONALITY_TAGS = [
@@ -74,9 +80,11 @@ export default function SettingsScreen() {
   const { signOut, session } = useAuth();
   const [skipQuestionnaireLimit, setSkipQuestionnaireLimit] = useState(false);
   const [showEncountersWithoutNight, setShowEncountersWithoutNight] = useState(false);
+  const [profileDisplayName, setProfileDisplayName] = useState<string | null>(null);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
+  const [displayNameInput, setDisplayNameInput] = useState("");
   const [avatarUrlInput, setAvatarUrlInput] = useState("");
-  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const [isSavingAccount, setIsSavingAccount] = useState(false);
 
   // 性格設定用のstate
   const [personalityTags, setPersonalityTags] = useState<string[]>([]);
@@ -86,8 +94,11 @@ export default function SettingsScreen() {
   const loadProfile = useCallback(async () => {
     try {
       const profile = await getMyProfile();
+      const displayName = profile?.display_name ?? null;
       const avatarUrl = profile?.avatar_url ?? null;
+      setProfileDisplayName(displayName);
       setProfileAvatarUrl(avatarUrl);
+      setDisplayNameInput(displayName ?? "");
       setAvatarUrlInput(avatarUrl ?? "");
     } catch (error) {
       console.error("プロフィールの取得に失敗:", error);
@@ -167,15 +178,16 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleSaveAvatarUrl = async () => {
-    setIsSavingAvatar(true);
+  const handleSaveAccount = async () => {
+    setIsSavingAccount(true);
     try {
+      await updateMyDisplayName(displayNameInput);
       await updateMyAvatar(avatarUrlInput);
       await loadProfile();
     } catch {
-      Alert.alert("エラー", "アバターURLの保存に失敗しました");
+      Alert.alert("エラー", "アカウント情報の保存に失敗しました");
     } finally {
-      setIsSavingAvatar(false);
+      setIsSavingAccount(false);
     }
   };
 
@@ -230,11 +242,14 @@ export default function SettingsScreen() {
         <View style={{ paddingHorizontal: 24, gap: 16 }}>
           <AccountCard
             session={session}
+            profileDisplayName={profileDisplayName}
             profileAvatarUrl={profileAvatarUrl}
+            displayNameInput={displayNameInput}
+            onDisplayNameChange={setDisplayNameInput}
             avatarUrlInput={avatarUrlInput}
-            isSavingAvatar={isSavingAvatar}
             onAvatarUrlChange={setAvatarUrlInput}
-            onSaveAvatarUrl={handleSaveAvatarUrl}
+            onSaveAccount={handleSaveAccount}
+            isSavingAccount={isSavingAccount}
           />
           <PersonalitySection
             tags={PERSONALITY_TAGS}

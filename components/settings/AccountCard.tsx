@@ -7,21 +7,29 @@ import { Fonts } from "@/constants/theme";
 
 type AccountCardProps = {
   session: Session | null;
+  profileDisplayName: string | null;
   profileAvatarUrl: string | null;
+  displayNameInput: string;
+  onDisplayNameChange: (value: string) => void;
   avatarUrlInput: string;
-  isSavingAvatar: boolean;
   onAvatarUrlChange: (value: string) => void;
-  onSaveAvatarUrl: () => void;
+  onSaveAccount: () => void;
+  isSavingAccount: boolean;
 };
 
 export function AccountCard({
   session,
+  profileDisplayName,
   profileAvatarUrl,
+  displayNameInput,
+  onDisplayNameChange,
   avatarUrlInput,
-  isSavingAvatar,
   onAvatarUrlChange,
-  onSaveAvatarUrl,
+  onSaveAccount,
+  isSavingAccount,
 }: AccountCardProps) {
+  const displayName =
+    profileDisplayName ?? session?.user?.user_metadata?.display_name ?? null;
   return (
     <View
       style={{
@@ -55,7 +63,7 @@ export function AccountCard({
           </Text>
           {session?.user && (
             <>
-              {session.user.user_metadata?.display_name ? (
+              {displayName ? (
                 <Text
                   selectable
                   numberOfLines={1}
@@ -66,7 +74,7 @@ export function AccountCard({
                     fontFamily: Fonts.rounded,
                   }}
                 >
-                  {session.user.user_metadata.display_name}
+                  {displayName}
                 </Text>
               ) : null}
               <Text
@@ -96,6 +104,34 @@ export function AccountCard({
             fontFamily: Fonts.rounded,
           }}
         >
+          表示名
+        </Text>
+        <TextInput
+          placeholder="表示名を入力"
+          placeholderTextColor="rgba(113, 130, 104, 0.5)"
+          value={displayNameInput}
+          onChangeText={onDisplayNameChange}
+          style={{
+            height: 44,
+            borderRadius: 12,
+            backgroundColor: "rgba(168, 223, 142, 0.1)",
+            paddingHorizontal: 14,
+            fontSize: 13,
+            color: "#141712",
+            fontFamily: Fonts.rounded,
+          }}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        <Text
+          selectable
+          style={{
+            fontSize: 12,
+            fontWeight: "700",
+            color: "#718268",
+            fontFamily: Fonts.rounded,
+          }}
+        >
           アバターURL
         </Text>
         <TextInput
@@ -116,14 +152,14 @@ export function AccountCard({
           autoCorrect={false}
         />
         <Pressable
-          onPress={onSaveAvatarUrl}
-          disabled={isSavingAvatar}
+          onPress={onSaveAccount}
+          disabled={isSavingAccount}
           style={{
             backgroundColor: "rgba(168, 223, 142, 0.3)",
             borderRadius: 12,
             paddingVertical: 10,
             alignItems: "center",
-            opacity: isSavingAvatar ? 0.7 : 1,
+            opacity: isSavingAccount ? 0.7 : 1,
           }}
         >
           <Text
@@ -135,7 +171,7 @@ export function AccountCard({
               fontFamily: Fonts.rounded,
             }}
           >
-            {isSavingAvatar ? "保存中..." : "保存"}
+            {isSavingAccount ? "保存中..." : "保存"}
           </Text>
         </Pressable>
       </View>

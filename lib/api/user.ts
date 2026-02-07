@@ -62,6 +62,50 @@ export async function updateMyAvatar(avatarUrl: string): Promise<void> {
   }
 }
 
+const DISPLAY_NAME_MAX_LENGTH = 100;
+
+/**
+ * 自分の表示名を更新（public.users と Auth の user_metadata の両方を更新）
+ * @param displayName 新しい表示名。空文字の場合は null に更新。最大100文字。
+ */
+export async function updateMyDisplayName(displayName: string): Promise<void> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("認証情報の取得に失敗しました");
+  }
+
+  const value =
+    displayName.trim() === ""
+      ? null
+      : displayName.trim().slice(0, DISPLAY_NAME_MAX_LENGTH);
+
+  const { error } = await supabase
+    .from("users")
+    .update({
+      display_name: value,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("uuid", user.id);
+
+  if (error) {
+    console.error("表示名の更新に失敗:", error);
+    throw new Error(`表示名の更新に失敗: ${error.message}`);
+  }
+
+  const { error: authUpdateError } = await supabase.auth.updateUser({
+    data: { display_name: value },
+  });
+
+  if (authUpdateError) {
+    console.error("Auth user_metadata の更新に失敗:", authUpdateError);
+    throw new Error(`表示名の更新に失敗: ${authUpdateError.message}`);
+  }
+}
+
 /**
  * 性格設定（タグと自由入力）を更新（mascotsテーブル）
  * @param tags 性格タグ（最大5個）
