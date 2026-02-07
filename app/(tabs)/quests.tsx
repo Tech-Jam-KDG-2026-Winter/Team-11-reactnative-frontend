@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Easing, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
@@ -272,14 +273,18 @@ export default function QuestsScreen() {
     }
   }, [userUuid]);
 
-  useEffect(() => {
-    const load = async () => {
+  useFocusEffect(
+    useCallback(() => {
+      if (!userUuid) {
+        setIsLoading(false);
+        return;
+      }
       setIsLoading(true);
-      await Promise.all([fetchQuests(), fetchMascot()]);
-      setIsLoading(false);
-    };
-    load();
-  }, [fetchMascot, fetchQuests]);
+      Promise.all([fetchQuests(), fetchMascot()]).finally(() => {
+        setIsLoading(false);
+      });
+    }, [userUuid, fetchQuests, fetchMascot])
+  );
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
