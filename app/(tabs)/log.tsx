@@ -290,6 +290,19 @@ export default function LogScreen() {
           <Text
             selectable
             style={{
+              fontSize: 13,
+              color: '#7DA15E',
+              textAlign: 'center',
+              fontWeight: '700',
+              fontFamily: Fonts.rounded,
+              letterSpacing: 0.2,
+            }}
+          >
+            他のユーザーが達成したクエストに挑戦してみましょう
+          </Text>
+          <Text
+            selectable
+            style={{
               fontSize: 12,
               color: '#718268',
               fontStyle: 'italic',
