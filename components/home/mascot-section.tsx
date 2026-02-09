@@ -112,63 +112,11 @@ export function MascotSection({ mascot, isLoading, imageUrls }: MascotSectionPro
             boxShadow: "0 0 60px rgba(168, 223, 142, 0.5)",
           }}
         />
-        <View
-          style={{
-            width: 220,
-            height: 220,
-            borderRadius: 999,
-            overflow: "hidden",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#FFFFFF",
-            borderWidth: 2,
-            borderColor: "rgba(0,0,0,0.7)",
-            boxShadow: "0 0 64px rgba(255,255,255,0.55)",
-            shadowColor: "#FFFFFF",
-            shadowOpacity: 0.75,
-            shadowRadius: 34,
-            shadowOffset: { width: 0, height: 0 },
-          }}
-        >
-          <Image
-            source={imageSource}
-            contentFit="cover"
-            style={{ width: 220, height: 160 }}
-          />
-          <View
-            pointerEvents="none"
-            style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: 999,
-              borderWidth: 28,
-              borderColor: "rgba(255,255,255,0.18)",
-              boxShadow: "inset 0 0 48px rgba(255,255,255,0.7)",
-            }}
-          />
-          <View
-            pointerEvents="none"
-            style={{
-              position: "absolute",
-              inset: -10,
-              borderRadius: 999,
-              borderWidth: 16,
-              borderColor: "rgba(255,255,255,0.16)",
-              boxShadow: "0 0 56px rgba(255,255,255,0.45)",
-            }}
-          />
-          <View
-            pointerEvents="none"
-            style={{
-              position: "absolute",
-              inset: -18,
-              borderRadius: 999,
-              borderWidth: 20,
-              borderColor: "rgba(255,255,255,0.1)",
-              boxShadow: "0 0 72px rgba(255,255,255,0.35)",
-            }}
-          />
-        </View>
+        <Image
+          source={imageSource}
+          contentFit="contain"
+          style={{ width: 220, height: 220 }}
+        />
       </View>
       <View
         style={{
