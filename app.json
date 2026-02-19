@@ -15,10 +15,13 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "バックグラウンドでも位置情報を記録し、すれ違い機能を有効にします。",
         "UIBackgroundModes": [
           "location",
+          "location",
+          "location",
           "location"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.berry7028.koko"
+      "bundleIdentifier": "com.techjam.koko"
     },
     "android": {
       "adaptiveIcon": {
@@ -41,7 +44,7 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
-      "package": "com.berry7028.koko"
+      "package": "com.techjam.koko"
     },
     "web": {
       "output": "static",
@@ -75,6 +78,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3b810fb9-46a2-41ad-83ce-5710333d811a"
+      }
     }
   }
 }
