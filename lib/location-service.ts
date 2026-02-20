@@ -112,6 +112,7 @@ export async function startLocationTracking(): Promise<boolean> {
       accuracy: Location.Accuracy.Balanced, // バッテリー消費を抑制
       timeInterval: 60000, // 1分ごと（ミリ秒）
       distanceInterval: 0, // 距離による制限なし
+      activityType: Location.ActivityType.Other, // iOSがバックグラウンド更新を最適化するためのヒント
       foregroundService: {
         notificationTitle: "すれ違い機能",
         notificationBody: "位置情報を記録しています",

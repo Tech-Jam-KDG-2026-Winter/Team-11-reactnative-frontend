@@ -5,13 +5,18 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { AppState, AppStateStatus } from "react-native";
 import "react-native-reanimated";
+import * as Location from "expo-location";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useLocation } from "@/hooks/use-location";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { NotificationProvider } from "@/providers/NotificationProvider";
+import { recordLocation } from "@/lib/api/location";
+
+const FOREGROUND_INTERVAL_MS = 60_000;
 
 export const unstable_settings = {
   anchor: "(auth)",
@@ -20,6 +25,28 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const { requestPermissions, startTracking, permissions } = useLocation();
+  const foregroundTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // フォアグラウンド時に1分ごと位置情報をポストするタイマー
+  const startForegroundTimer = () => {
+    if (foregroundTimerRef.current !== null) return;
+    foregroundTimerRef.current = setInterval(async () => {
+      try {
+        const { coords } = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        await recordLocation(coords.latitude, coords.longitude, coords.accuracy ?? undefined);
+      } catch {
+      }
+    }, FOREGROUND_INTERVAL_MS);
+  };
+
+  const stopForegroundTimer = () => {
+    if (foregroundTimerRef.current !== null) {
+      clearInterval(foregroundTimerRef.current);
+      foregroundTimerRef.current = null;
+    }
+  };
 
   // アプリ起動時に位置情報の権限を要求し、トラッキングを開始
   useEffect(() => {
@@ -34,7 +61,12 @@ export default function RootLayout() {
     initializeLocation();
   }, []);
 
-  // 権限が許可されたらトラッキングを開始
+  useEffect(() => {
+    if (permissions?.foreground) {
+      startForegroundTimer();
+    }
+  }, [permissions]);
+
   useEffect(() => {
     if (permissions?.foreground && permissions?.background) {
       startTracking().catch((error) => {
@@ -42,6 +74,23 @@ export default function RootLayout() {
       });
     }
   }, [permissions]);
+
+  // フォアグラウンド / バックグラウンド切り替えでタイマーを制御
+  useEffect(() => {
+    const handleAppStateChange = (nextState: AppStateStatus) => {
+      if (nextState === "active") {
+        startForegroundTimer();
+      } else {
+        stopForegroundTimer();
+      }
+    };
+
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
+    return () => {
+      subscription.remove();
+      stopForegroundTimer();
+    };
+  }, []);
 
   return (
     <AuthProvider>
