@@ -301,7 +301,7 @@ export default function SettingsScreen() {
             }
             onSave={handleSavePersonality}
           />
-          <DebugNotificationsCard
+          {/* <DebugNotificationsCard
             onSendMorning={() => handleDebugNotification("morning")}
             onSendNight={() => handleDebugNotification("night")}
           />
@@ -310,7 +310,7 @@ export default function SettingsScreen() {
             showEncountersWithoutNight={showEncountersWithoutNight}
             onToggleSkipLimit={handleToggleSkipLimit}
             onToggleShowEncounters={handleToggleShowEncounters}
-          />
+          /> */}
           <LogoutButton onPress={handleLogout} />
         </View>
       </ScrollView>
