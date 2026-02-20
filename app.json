@@ -14,9 +14,6 @@
         "NSLocationWhenInUseUsageDescription": "あなたの現在地を記録し、近くにいる仲間とすれ違いを検出します。",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "バックグラウンドでも位置情報を記録し、すれ違い機能を有効にします。",
         "UIBackgroundModes": [
-          "location",
-          "location",
-          "location",
           "location"
         ],
         "ITSAppUsesNonExemptEncryption": false
